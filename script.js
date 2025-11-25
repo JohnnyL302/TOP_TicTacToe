@@ -45,6 +45,7 @@ const gameController = (() => {
     ];
 
     const start = () => {
+        restart();
         players = [
             createPlayer(document.querySelector("#player1").value, "X"), 
             createPlayer(document.querySelector("#player2").value, "O")
@@ -53,7 +54,16 @@ const gameController = (() => {
         gameOver = false; 
 
         gameboard.render();
+    }
 
+    const restart = () => {
+        for (let i = 0; i < 9;i++) {
+            gameboard.board[i] = "";
+        }
+        currPlayerIndex = 0; 
+        gameOver = false;
+
+        gameboard.render(); // redraw empty board
     }
 
     const makeClick = (event) => {
@@ -111,7 +121,8 @@ const gameController = (() => {
 
     return {
         start,
-        makeClick 
+        makeClick,
+        restart,
     }
 })(); 
 
@@ -130,5 +141,11 @@ const startButton = document.querySelector("#start-button");
 startButton.addEventListener("click", () => {
     gameController.start(); 
 }); 
+
+const resetButton = document.querySelector("#restart-button"); 
+resetButton.addEventListener("click", () => {
+    gameController.restart(); 
+});
+
 
  
