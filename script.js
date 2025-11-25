@@ -33,6 +33,17 @@ const gameController = (() => {
     let currPlayerIndex; 
     let gameOver; 
 
+    const winningCombos = [
+        [0, 1, 2], 
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7], 
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+
     const start = () => {
         players = [
             createPlayer(document.querySelector("#player1").value, "X"), 
@@ -57,9 +68,45 @@ const gameController = (() => {
             return; 
         }
         gameboard.board[index] = players[currPlayerIndex].mark;  
+
+        const getPlayerName = (mark) => {
+            return players.find(player => player.mark === mark);
+        }
+
+        const winner = checkWinner();
+        if (winner) {
+            const winningPlayer = getPlayerName(winner);
+            alert(`${winningPlayer.name} wins!`);
+            gameOver = true;
+            gameboard.render(); 
+            return;
+        }
+        if (checkTie()) {
+            alert("It's an Tie!"); 
+            gameOver = true;
+            gameboard.render();
+            return;
+        }
+
+
         currPlayerIndex = currPlayerIndex === 0 ? 1 : 0; 
 
         gameboard.render(); 
+    }
+
+    const checkWinner = () => {
+        for (let combo of winningCombos) {
+            const [a, b, c] =  combo; 
+            if (gameboard.board[a] && gameboard.board[a] === gameboard.board[b] && 
+                gameboard.board[a] === gameboard.board[c]) {
+                    return gameboard.board[a];    // returns winning mark if [a, b, c] all matches  
+                }
+        }
+        return null; 
+    }
+
+    const checkTie = () =>  {
+        return gameboard.board.every(square => square != ""); 
     }
 
     return {
