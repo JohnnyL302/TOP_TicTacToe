@@ -10,9 +10,11 @@ const gameboard = (() => {
             boardHTML += `<div class="square" id="square-${index}">${square}</div>`
         })
         document.querySelector("#game-display").innerHTML = boardHTML; 
+        attachSquareListeners(); 
     }
     return {
         render,
+        board: gameboard,
     }
 })(); 
 
@@ -29,7 +31,7 @@ const createPlayer = (name, mark) => {
 const gameController = (() => {
     let players = []; 
     let currPlayerIndex; 
-    let gameOve; 
+    let gameOver; 
 
     const start = () => {
         players = [
@@ -39,22 +41,41 @@ const gameController = (() => {
         currPlayerIndex = 0; 
         gameOver = false; 
 
-        // make each sqaure clickable 
-        const squares = document.querySelectorAll(".square"); 
-        squares.forEach((square) => {
-            square.addEventListener("click", makeClick);
-        })
+        gameboard.render();
+
     }
 
     const makeClick = (event) => {
-        console.log(event.target.id.split("-")[1]); 
+        if (gameOver) {
+            return; 
+        } 
+        const index = parseInt(event.target.id.split("-")[1], 10); 
+        if (Number.isNaN(index)) {
+            return;
+        }
+        if (gameboard.board[index] !== "") {
+            return; 
+        }
+        gameboard.board[index] = players[currPlayerIndex].mark;  
+        currPlayerIndex = currPlayerIndex === 0 ? 1 : 0; 
+
+        gameboard.render(); 
     }
 
     return {
         start,
-        // makeClick // unsure if i need to return this 
+        makeClick 
     }
 })(); 
+
+// make each sqaure clickable 
+function attachSquareListeners() {
+    const squares = document.querySelectorAll(".square");  
+    squares.forEach(square => {
+         square.addEventListener("click", gameController.makeClick);
+    });
+}
+
 
 gameboard.render(); // makes the 3x3 grid show up 
 
